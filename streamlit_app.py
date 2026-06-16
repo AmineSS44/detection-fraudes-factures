@@ -33,6 +33,11 @@ from backend.auth import (
 from ml.feature_engineering import FeatureEngine
 from ml.fraud_detector import FraudDetector, COMPARISON_PATH, MODEL_PATH
 
+# --- Résolution des chemins absolus ---
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+ABS_MODEL_PATH = os.path.join(PROJECT_ROOT, MODEL_PATH)
+ABS_COMPARISON_PATH = os.path.join(PROJECT_ROOT, COMPARISON_PATH)
+
 # --- Configuration ---
 
 MAX_FILE_SIZE_MB = 10
@@ -53,10 +58,10 @@ st.set_page_config(
 @st.cache_resource
 def init_application():
     """Initialise la base de données et le compte démo."""
-    os.makedirs("data", exist_ok=True)
-    os.makedirs("uploads", exist_ok=True)
-    os.makedirs("models", exist_ok=True)
-    os.makedirs("results", exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, "data"), exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, "uploads"), exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, "models"), exist_ok=True)
+    os.makedirs(os.path.join(PROJECT_ROOT, "results"), exist_ok=True)
     init_db()
     db = SessionLocal()
     try:
@@ -400,7 +405,7 @@ def _run_analysis_direct(uploaded_file, file_extension):
             stage_text.markdown("⏳ **Stage 3/3**: Détection de fraude...")
             progress_bar.progress(0.75)
 
-            detector = FraudDetector()
+            detector = FraudDetector(model_path=ABS_MODEL_PATH)
             fraud_result = detector.predict(feature_vector)
 
             # Persistance en DB
@@ -493,7 +498,7 @@ def show_ml_report():
     st.markdown("---")
 
     # Charger le rapport
-    comparison_path = COMPARISON_PATH
+    comparison_path = ABS_COMPARISON_PATH
     if not os.path.exists(comparison_path):
         st.warning("⚠️ Rapport non disponible. Exécutez `python ml/train.py` pour générer le rapport.")
         return

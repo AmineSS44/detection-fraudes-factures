@@ -18,8 +18,13 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
-# Chemin par défaut de la base SQLite
-DATABASE_URL = "sqlite:///data/invoices.db"
+# Chemin par défaut de la base SQLite (résolu en absolu depuis la racine du projet)
+import os as _os
+
+_PROJECT_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_DB_PATH = _os.path.join(_PROJECT_ROOT, "data", "invoices.db")
+_os.makedirs(_os.path.dirname(_DB_PATH), exist_ok=True)
+DATABASE_URL = f"sqlite:///{_DB_PATH}"
 
 engine = create_engine(
     DATABASE_URL,
