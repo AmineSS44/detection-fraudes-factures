@@ -1,0 +1,33 @@
+# Backend
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+sqlalchemy==2.0.23
+pydantic==2.5.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Frontend
+streamlit==1.29.0
+requests==2.31.0
+
+# OCR
+ultralytics==8.0.230
+pytesseract==0.3.10
+opencv-python==4.8.1.78
+pdf2image==1.16.3
+
+# ML & Data
+numpy==1.26.2
+pandas==2.1.4
+scikit-learn==1.3.2
+
+# Visualisation
+plotly==5.18.0
+
+# Testing
+hypothesis==6.92.2
+pytest==7.4.3
+pytest-cov==4.1.0
+httpx==0.25.2
+factory_boy==3.3.1
