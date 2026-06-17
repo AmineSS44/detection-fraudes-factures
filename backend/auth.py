@@ -7,8 +7,8 @@ et le verrouillage de compte après tentatives échouées.
 from datetime import datetime, timedelta
 from typing import Optional
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from backend.database import User
@@ -22,18 +22,30 @@ TOKEN_EXPIRY_HOURS = 24
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_DURATION_MINUTES = 15
 
-# Contexte de hachage des mots de passe
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# bcrypt limite les mots de passe à 72 octets
+_BCRYPT_MAX_BYTES = 72
+
+
+def _truncate_password(password: str) -> bytes:
+    """Encode et tronque le mot de passe à 72 octets (limite bcrypt)."""
+    return password.encode("utf-8")[:_BCRYPT_MAX_BYTES]
 
 
 def hash_password(password: str) -> str:
     """Hache un mot de passe en bcrypt."""
-    return pwd_context.hash(password)
+    hashed = bcrypt.hashpw(_truncate_password(password), bcrypt.gensalt())
+    return hashed.decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Vérifie un mot de passe contre son hash bcrypt."""
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return bcrypt.checkpw(
+            _truncate_password(plain_password),
+            hashed_password.encode("utf-8"),
+        )
+    except (ValueError, TypeError):
+        return False
 
 
 def create_token(username: str) -> str:
